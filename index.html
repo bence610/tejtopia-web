@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tejtópia S2</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* HÁTTÉRKÉP */
+        body::before {
+            content: "";
+            position: fixed;
+            top: -15px;
+            left: -15px;
+            width: calc(100% + 30px);
+            height: calc(100% + 30px);
+
+            background-image: url("tejtopia-bg.png");
+            background-size: cover;
+            background-position: center;
+
+            filter: blur(7px) brightness(0.45);
+            transform: scale(1.03);
+
+            z-index: -2;
+        }
+
+        /* SÖTÉT RÉTEG */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(0,0,0,0.20),
+                    rgba(0,0,0,0.75)
+                );
+
+            z-index: -1;
+        }
+
+        /* FŐOLDAL */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .logo {
+            font-size: clamp(45px, 8vw, 90px);
+            font-weight: 900;
+            letter-spacing: 3px;
+
+            text-shadow:
+                0 0 10px rgba(255,255,255,0.4),
+                0 5px 20px rgba(0,0,0,0.8);
+
+            animation: logoAnimation 1s ease;
+        }
+
+        .subtitle {
+            margin-top: 10px;
+            color: #dddddd;
+            font-size: 18px;
+            letter-spacing: 2px;
+        }
+
+        /* GOMBOK */
+        .server-buttons {
+            margin-top: 45px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .server-btn {
+            width: 230px;
+            padding: 17px;
+
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+
+            background: rgba(15,15,15,0.70);
+            backdrop-filter: blur(10px);
+
+            color: white;
+            font-size: 19px;
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.3s;
+        }
+
+        .server-btn:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.15);
+
+            box-shadow:
+                0 10px 35px rgba(0,0,0,0.5);
+        }
+
+        .s2 {
+            border-color: rgba(91,255,145,0.5);
+        }
+
+        .s2:hover {
+            box-shadow:
+                0 0 25px rgba(91,255,145,0.25),
+                0 10px 35px rgba(0,0,0,0.5);
+        }
+
+        /* S2 PANEL */
+        .s2-panel {
+            display: none;
+
+            width: min(1100px, 92%);
+            margin: 0 auto 80px auto;
+            padding: 35px;
+
+            background: rgba(10,10,10,0.80);
+
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 20px;
+
+            backdrop-filter: blur(18px);
+
+            box-shadow:
+                0 25px 70px rgba(0,0,0,0.6);
+
+            animation: panelOpen 0.6s ease;
+        }
+
+        .s2-panel.active {
+            display: block;
+        }
+
+        .panel-title {
+            text-align: center;
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .panel-description {
+            text-align: center;
+            color: #bbbbbb;
+            margin-bottom: 35px;
+        }
+
+        /* KÁRTYÁK */
+        .cards {
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(230px, 1fr));
+
+            gap: 20px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.06);
+
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+
+            padding: 25px;
+
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.10);
+        }
+
+        .card h2 {
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+
+        .card p {
+            color: #cccccc;
+            line-height: 1.6;
+        }
+
+        /* EVENT */
+        .event {
+            margin-top: 15px;
+
+            padding: 12px;
+
+            background: rgba(0,0,0,0.35);
+            border-radius: 8px;
+        }
+
+        .event-title {
+            font-weight: bold;
+            color: #7dff9e;
+        }
+
+        /* LINK GOMBOK */
+        .social-btn {
+            display: block;
+
+            text-decoration: none;
+
+            margin-top: 10px;
+            padding: 12px;
+
+            border-radius: 8px;
+
+            background: rgba(255,255,255,0.08);
+
+            color: white;
+
+            transition: 0.25s;
+        }
+
+        .social-btn:hover {
+            background: white;
+            color: black;
+            transform: translateX(5px);
+        }
+
+        /* STÁTUSZ */
+        .online {
+            color: #63ff8c;
+            font-weight: bold;
+        }
+
+        /* ALSÓ RÉSZ */
+        footer {
+            text-align: center;
+
+            padding: 25px;
+
+            color: #888;
+            background: rgba(0,0,0,0.6);
+        }
+
+        /* ANIMÁCIÓK */
+        @keyframes logoAnimation {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes panelOpen {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* TELEFON */
+        @media (max-width: 600px) {
+
+            .server-buttons {
+                flex-direction: column;
+            }
+
+            .server-btn {
+                width: 280px;
+            }
+
+            .s2-panel {
+                padding: 20px;
+            }
+
+            .panel-title {
+                font-size: 30px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- FŐOLDAL -->
+    <section class="hero">
+
+        <h1 class="logo">
+            TEJTÓPIA
+        </h1>
+
+        <p class="subtitle">
+            Minecraft RolePlay szerver
+        </p>
+
+        <div class="server-buttons">
+
+            <button
+                class="server-btn s2"
+                onclick="openS2()"
+            >
+                🥛 Tejtópia S2
+            </button>
+
+            <button
+                class="server-btn"
+                onclick="openS1()"
+            >
+                🕓 Tejtópia S1
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- S2 PANEL -->
+    <section
+        class="s2-panel"
+        id="s2Panel"
+    >
+
+        <h1 class="panel-title">
+            🥛 Tejtópia S2
+        </h1>
+
+        <p class="panel-description">
+            Üdvözlünk a Tejtópia második szezonjának hivatalos oldalán!
+        </p>
+
+
+        <div class="cards">
+
+
+            <!-- EVENTEK -->
+            <div class="card">
+
+                <h2>
+                    📅 Eventek
+                </h2>
+
+                <div class="event">
+                    <div class="event-title">
+                        🎉 S2 Nyitó Event
+                    </div>
+
+                    <p>
+                        Hamarosan...
+                    </p>
+                </div>
+
+
+                <div class="event">
+                    <div class="event-title">
+                        ⚔️ Közösségi Event
+                    </div>
+
+                    <p>
+                        Információ hamarosan.
+                    </p>
+                </div>
+
+
+                <div class="event">
+                    <div class="event-title">
+                        🎁 Nyereményjáték
+                    </div>
+
+                    <p>
+                        Figyeld a Discord szervert!
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- KÖZÖSSÉGI MÉDIA -->
+            <div class="card">
+
+                <h2>
+                    🌐 Közösségi média
+                </h2>
+
+                <a
+                    href="#"
+                    class="social-btn"
+                >
+                    💬 Discord
+                </a>
+
+                <a
+                    href="#"
+                    class="social-btn"
+                >
+                    ▶️ YouTube
+                </a>
+
+                <a
+                    href="#"
+                    class="social-btn"
+                >
+                    🎵 TikTok
+                </a>
+
+            </div>
+
+
+            <!-- SZERVER -->
+            <div class="card">
+
+                <h2>
+                    🎮 Szerver információ
+                </h2>
+
+                <p>
+                    <strong>Szerver:</strong>
+                    Tejtópia S2
+                </p>
+
+                <br>
+
+                <p>
+                    <strong>Játékmód:</strong>
+                    RolePlay
+                </p>
+
+                <br>
+
+                <p>
+                    <strong>Státusz:</strong>
+                    <span class="online">
+                        ● ONLINE
+                    </span>
+                </p>
+
+                <br>
+
+                <p>
+                    <strong>IP cím:</strong>
+                    hamarosan
+                </p>
+
+            </div>
+
+
+            <!-- HÍREK -->
+            <div class="card">
+
+                <h2>
+                    📰 Legfrissebb hírek
+                </h2>
+
+                <p>
+                    A Tejtópia S2 fejlesztése folyamatban van.
+                </p>
+
+                <br>
+
+                <p>
+                    Új helyszínek, új történetek és új eventek
+                    érkeznek.
+                </p>
+
+                <br>
+
+                <p>
+                    További információk hamarosan!
+                </p>
+
+            </div>
+
+
+            <!-- S2 ÚJDONSÁGOK -->
+            <div class="card">
+
+                <h2>
+                    ✨ S2 újdonságok
+                </h2>
+
+                <p>
+                    🏘️ Új területek
+                </p>
+
+                <p>
+                    📜 Új RP történetek
+                </p>
+
+                <p>
+                    🎉 Több event
+                </p>
+
+                <p>
+                    👥 Fejlesztett közösségi rendszer
+                </p>
+
+            </div>
+
+
+            <!-- STAFF -->
+            <div class="card">
+
+                <h2>
+                    👑 Tejtópia Staff
+                </h2>
+
+                <p>
+                    Tulajdonos:
+                    <strong>Bence</strong>
+                </p>
+
+                <br>
+
+                <p>
+                    Adminok és moderátorok hamarosan.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <footer>
+        © 2026 Tejtópia • Minden jog fenntartva
+    </footer>
+
+
+    <script>
+
+        function openS2() {
+
+            const panel =
+                document.getElementById("s2Panel");
+
+            panel.classList.add("active");
+
+            setTimeout(function() {
+
+                panel.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+
+            }, 100);
+        }
+
+
+        function openS1() {
+
+            alert(
+                "Tejtópia S1 – Az első szezon oldala jelenleg nem elérhető."
+            );
+
+        }
+
+    </script>
+
+</body>
+</html>
