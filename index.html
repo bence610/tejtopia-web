@@ -1,472 +1,550 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tejtópia S2</title>
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            min-height: 100vh;
-            color: white;
-            overflow-x: hidden;
-        }
-
-        /* HÁTTÉRKÉP */
-        body::before {
-            content: "";
-            position: fixed;
-            top: -15px;
-            left: -15px;
-            width: calc(100% + 30px);
-            height: calc(100% + 30px);
-
-            background-image: url("tejtopia-bg.png");
-            background-size: cover;
-            background-position: center;
-
-            filter: blur(7px) brightness(0.45);
-            transform: scale(1.03);
-
-            z-index: -2;
-        }
-
-        /* SÖTÉT RÉTEG */
-        body::after {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-
-            background:
-                linear-gradient(
-                    180deg,
-                    rgba(0,0,0,0.20),
-                    rgba(0,0,0,0.75)
-                );
-
-            z-index: -1;
-        }
-
-        /* FŐOLDAL */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 30px;
-        }
-
-        .logo {
-            font-size: clamp(45px, 8vw, 90px);
-            font-weight: 900;
-            letter-spacing: 3px;
-
-            text-shadow:
-                0 0 10px rgba(255,255,255,0.4),
-                0 5px 20px rgba(0,0,0,0.8);
-
-            animation: logoAnimation 1s ease;
-        }
-
-        .subtitle {
-            margin-top: 10px;
-            color: #dddddd;
-            font-size: 18px;
-            letter-spacing: 2px;
-        }
-
-        /* GOMBOK */
-        .server-buttons {
-            margin-top: 45px;
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .server-btn {
-            width: 230px;
-            padding: 17px;
-
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 12px;
-
-            background: rgba(15,15,15,0.70);
-            backdrop-filter: blur(10px);
-
-            color: white;
-            font-size: 19px;
-            font-weight: bold;
-
-            cursor: pointer;
-
-            transition: 0.3s;
-        }
-
-        .server-btn:hover {
-            transform: translateY(-5px);
-            background: rgba(255,255,255,0.15);
-
-            box-shadow:
-                0 10px 35px rgba(0,0,0,0.5);
-        }
-
-        .s2 {
-            border-color: rgba(91,255,145,0.5);
-        }
-
-        .s2:hover {
-            box-shadow:
-                0 0 25px rgba(91,255,145,0.25),
-                0 10px 35px rgba(0,0,0,0.5);
-        }
-
-        /* S2 PANEL */
-        .s2-panel {
-            display: none;
-
-            width: min(1100px, 92%);
-            margin: 0 auto 80px auto;
-            padding: 35px;
-
-            background: rgba(10,10,10,0.80);
-
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 20px;
-
-            backdrop-filter: blur(18px);
-
-            box-shadow:
-                0 25px 70px rgba(0,0,0,0.6);
-
-            animation: panelOpen 0.6s ease;
-        }
-
-        .s2-panel.active {
-            display: block;
-        }
-
-        .panel-title {
-            text-align: center;
-            font-size: 40px;
-            margin-bottom: 10px;
-        }
-
-        .panel-description {
-            text-align: center;
-            color: #bbbbbb;
-            margin-bottom: 35px;
-        }
-
-        /* KÁRTYÁK */
-        .cards {
-            display: grid;
-
-            grid-template-columns:
-                repeat(auto-fit, minmax(230px, 1fr));
-
-            gap: 20px;
-        }
-
-        .card {
-            background: rgba(255,255,255,0.06);
-
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 15px;
-
-            padding: 25px;
-
-            transition: 0.3s;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            background: rgba(255,255,255,0.10);
-        }
-
-        .card h2 {
-            margin-bottom: 15px;
-            font-size: 22px;
-        }
-
-        .card p {
-            color: #cccccc;
-            line-height: 1.6;
-        }
-
-        /* EVENT */
-        .event {
-            margin-top: 15px;
-
-            padding: 12px;
-
-            background: rgba(0,0,0,0.35);
-            border-radius: 8px;
-        }
-
-        .event-title {
-            font-weight: bold;
-            color: #7dff9e;
-        }
-
-        /* LINK GOMBOK */
-        .social-btn {
-            display: block;
-
-            text-decoration: none;
-
-            margin-top: 10px;
-            padding: 12px;
-
-            border-radius: 8px;
-
-            background: rgba(255,255,255,0.08);
-
-            color: white;
-
-            transition: 0.25s;
-        }
-
-        .social-btn:hover {
-            background: white;
-            color: black;
-            transform: translateX(5px);
-        }
-
-        /* STÁTUSZ */
-        .online {
-            color: #63ff8c;
-            font-weight: bold;
-        }
-
-        /* ALSÓ RÉSZ */
-        footer {
-            text-align: center;
-
-            padding: 25px;
-
-            color: #888;
-            background: rgba(0,0,0,0.6);
-        }
-
-        /* ANIMÁCIÓK */
-        @keyframes logoAnimation {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes panelOpen {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* TELEFON */
-        @media (max-width: 600px) {
-
-            .server-buttons {
-                flex-direction: column;
-            }
-
-            .server-btn {
-                width: 280px;
-            }
-
-            .s2-panel {
-                padding: 20px;
-            }
-
-            .panel-title {
-                font-size: 30px;
-            }
-        }
-
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tejtópia | Minecraft</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    color: white;
+    overflow-x: hidden;
+    background: #111;
+}
+
+/* HÁTTÉR */
+body::before {
+    content: "";
+    position: fixed;
+    inset: -20px;
+    background: url("tejtopia-bg.png") center/cover no-repeat;
+    filter: blur(8px);
+    z-index: -2;
+    transform: scale(1.05);
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.60);
+    z-index: -1;
+}
+
+/* FŐOLDAL */
+.container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 70px 20px;
+}
+
+.logo {
+    font-size: 58px;
+    font-weight: bold;
+    text-shadow: 0 0 20px rgba(255,255,255,0.4);
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: #ddd;
+    font-size: 18px;
+    margin-bottom: 45px;
+}
+
+/* GOMBOK */
+.buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.main-btn {
+    border: none;
+    padding: 17px 35px;
+    border-radius: 12px;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.25s;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.35);
+}
+
+.s2 {
+    background: linear-gradient(135deg, #3498db, #21618c);
+}
+
+.s1 {
+    background: linear-gradient(135deg, #777, #333);
+}
+
+.forest {
+    background: linear-gradient(135deg, #27ae60, #145a32);
+}
+
+.main-btn:hover {
+    transform: translateY(-4px) scale(1.03);
+}
+
+/* PANELEK */
+.panel {
+    display: none;
+    width: min(1100px, 95%);
+    margin-top: 50px;
+    padding: 30px;
+    border-radius: 20px;
+    background: rgba(20,20,20,0.78);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 15px 50px rgba(0,0,0,0.5);
+    animation: showPanel 0.4s ease;
+}
+
+@keyframes showPanel {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.panel h2 {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 32px;
+}
+
+.panel-description {
+    text-align: center;
+    color: #ccc;
+    margin-bottom: 30px;
+}
+
+/* KÁRTYÁK */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+}
+
+.card {
+    background: rgba(255,255,255,0.07);
+    padding: 22px;
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: 0.25s;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    background: rgba(255,255,255,0.11);
+}
+
+.card h3 {
+    margin-bottom: 12px;
+    font-size: 21px;
+}
+
+.card p {
+    color: #ccc;
+    line-height: 1.5;
+}
+
+/* LINK */
+.social a {
+    display: block;
+    text-decoration: none;
+    color: white;
+    background: rgba(255,255,255,0.08);
+    padding: 12px;
+    border-radius: 9px;
+    margin-top: 8px;
+    transition: 0.2s;
+}
+
+.social a:hover {
+    background: rgba(255,255,255,0.18);
+}
+
+/* IP */
+.ip {
+    font-size: 18px;
+    background: rgba(0,0,0,0.35);
+    padding: 14px;
+    border-radius: 10px;
+    margin-top: 10px;
+    text-align: center;
+    word-break: break-word;
+}
+
+/* EVENTEK */
+.event {
+    margin-top: 10px;
+    padding: 12px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 9px;
+}
+
+.event span {
+    font-weight: bold;
+}
+
+/* RANGOK */
+.rank {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 13px;
+    margin-top: 9px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 9px;
+}
+
+.price {
+    font-weight: bold;
+    color: #7CFC00;
+}
+
+/* FIGYELMEZTETÉS */
+.payment {
+    border: 1px solid rgba(255,215,0,0.3);
+    background: rgba(255,215,0,0.08);
+}
+
+.payment strong {
+    color: #ffd700;
+}
+
+/* FOOTER */
+footer {
+    margin-top: 50px;
+    color: #aaa;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* MOBIL */
+@media (max-width: 600px) {
+    .logo {
+        font-size: 40px;
+    }
+
+    .panel {
+        padding: 20px;
+    }
+
+    .main-btn {
+        width: 100%;
+    }
+}
+</style>
 </head>
 
 <body>
 
-    <!-- FŐOLDAL -->
-    <section class="hero">
+<div class="container">
 
-        <h1 class="logo">
-            TEJTÓPIA
-        </h1>
+    <div class="logo">🥛 TEJTÓPIA</div>
 
-        <p class="subtitle">
-            Minecraft RolePlay szerver
-        </p>
+    <div class="subtitle">
+        Magyar Minecraft közösség • RP • PvP • Minijátékok
+    </div>
 
-        <div class="server-buttons">
+    <!-- FŐ GOMBOK -->
+    <div class="buttons">
 
-            <button
-                class="server-btn s2"
-                onclick="openS2()"
-            >
-                🥛 Tejtópia S2
-            </button>
-
-            <button
-                class="server-btn"
-                onclick="openS1()"
-            >
-                🕓 Tejtópia S1
-            </button>
-
-        </div>
-
-    </section>
-
-
-    <!-- S2 PANEL -->
-    <section
-        class="s2-panel"
-        id="s2Panel"
-    >
-
-        <h1 class="panel-title">
+        <button class="main-btn s2" onclick="openPanel('s2Panel')">
             🥛 Tejtópia S2
-        </h1>
+        </button>
+
+        <button class="main-btn s1" onclick="openPanel('s1Panel')">
+            🥛 Tejtópia S1
+        </button>
+
+        <button class="main-btn forest" onclick="openPanel('forestPanel')">
+            🌲 ForestTopia
+        </button>
+
+    </div>
+
+
+    <!-- TEJTÓPIA S2 -->
+    <div class="panel" id="s2Panel">
+
+        <h2>🥛 Tejtópia S2</h2>
 
         <p class="panel-description">
-            Üdvözlünk a Tejtópia második szezonjának hivatalos oldalán!
+            A Tejtópia második szezonja – építs, játssz és csatlakozz a közösséghez!
         </p>
 
+        <div class="cards">
+
+            <div class="card">
+                <h3>🎉 Eventek</h3>
+
+                <div class="event">
+                    <span>🏆 Heti események</span>
+                </div>
+
+                <div class="event">
+                    <span>🎁 Különleges eventek</span>
+                </div>
+
+                <div class="event">
+                    <span>⚔️ Közösségi versenyek</span>
+                </div>
+            </div>
+
+
+            <div class="card">
+                <h3>🌐 Szerver</h3>
+
+                <p>Tejtópia S2 Minecraft szerver</p>
+
+                <div class="ip">
+                    Tejtopia_Rp.aternos.me:63655
+                </div>
+            </div>
+
+
+            <div class="card social">
+                <h3>💬 Közösségi média</h3>
+
+                <a href="https://discord.gg/eB6UCxDS" target="_blank">
+                    💬 Discord
+                </a>
+
+                <a href="https://www.youtube.com/@bbcsapat-lk3pm" target="_blank">
+                    ▶️ YouTube
+                </a>
+
+                <a href="https://www.tiktok.com/@bb_csapat.ofiicial" target="_blank">
+                    🎵 TikTok
+                </a>
+            </div>
+
+
+            <div class="card">
+                <h3>📰 Hírek</h3>
+
+                <p>
+                    Itt találhatod a Tejtópia legújabb híreit,
+                    frissítéseit és fontos bejelentéseit.
+                </p>
+            </div>
+
+
+            <div class="card">
+                <h3>👥 Közösség</h3>
+
+                <p>
+                    Csatlakozz a Discord közösségünkhöz,
+                    beszélgess a játékosokkal és vegyél részt
+                    a közös programokban!
+                </p>
+            </div>
+
+
+            <div class="card">
+                <h3>📜 Szabályzat</h3>
+
+                <p>
+                    A szerveren minden játékosnak be kell tartania
+                    a szerver szabályzatát és tiszteletben kell
+                    tartania a többi játékost.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- S1 -->
+    <div class="panel" id="s1Panel">
+
+        <h2>🥛 Tejtópia S1</h2>
+
+        <p class="panel-description">
+            A Tejtópia első szezonja.
+        </p>
 
         <div class="cards">
+
+            <div class="card">
+                <h3>ℹ️ Információ</h3>
+
+                <p>
+                    A Tejtópia S1 jelenleg nem aktív.
+                </p>
+            </div>
+
+            <div class="card social">
+                <h3>💬 Közösségi média</h3>
+
+                <a href="#" target="_blank">
+                    💬 Discord
+                </a>
+
+                <a href="#" target="_blank">
+                    ▶️ YouTube
+                </a>
+
+                <a href="#" target="_blank">
+                    🎵 TikTok
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- FORESTTOPIA -->
+    <div class="panel" id="forestPanel">
+
+        <h2>🌲 ForestTopia</h2>
+
+        <p class="panel-description">
+            Minecraft PvP & minijáték szerver
+        </p>
+
+        <div class="cards">
+
+            <!-- IP -->
+            <div class="card">
+                <h3>🌐 Szerver IP</h3>
+
+                <p>
+                    Csatlakozz a ForestTopia szerverhez:
+                </p>
+
+                <div class="ip">
+                    ForestTopia.aternos.me:39013
+                </div>
+            </div>
 
 
             <!-- EVENTEK -->
             <div class="card">
-
-                <h2>
-                    📅 Eventek
-                </h2>
+                <h3>🎮 Eventek</h3>
 
                 <div class="event">
-                    <div class="event-title">
-                        🎉 S2 Nyitó Event
-                    </div>
-
-                    <p>
-                        már volt..
-                    </p>
+                    🕵️ <span>Murder Mystery</span>
                 </div>
-
 
                 <div class="event">
-                    <div class="event-title">
-                        ⚔️ Közösségi Event
-                    </div>
-
-                    <p>
-                        még nincs..
-                    </p>
+                    ⚔️ <span>Knockback</span>
                 </div>
-
 
                 <div class="event">
-                    <div class="event-title">
-                        🎁 Nyereményjáték
-                    </div>
-
-                    <p>
-                        Figyeld a Discord szervert!
-                    </p>
+                    🏃 <span>Parkour</span>
                 </div>
+
+                <div class="event">
+                    🙈 <span>Hide and Seek</span>
+                </div>
+            </div>
+
+
+            <!-- RANGOK -->
+            <div class="card">
+                <h3>🏆 Rangok</h3>
+
+                <div class="rank">
+                    <span>🪨 Kő rang</span>
+                    <span class="price">200 Ft</span>
+                </div>
+
+                <div class="rank">
+                    <span>🟠 Réz rang</span>
+                    <span class="price">245 Ft</span>
+                </div>
+
+                <div class="rank">
+                    <span>🟡 Arany rang</span>
+                    <span class="price">540 Ft</span>
+                </div>
+
+                <div class="rank">
+                    <span>💎 Gyémánt rang</span>
+                    <span class="price">678 Ft</span>
+                </div>
+
+                <div class="rank">
+                    <span>🟣 Ametiszt rang</span>
+                    <span class="price">955 Ft</span>
+                </div>
+
+                <div class="rank">
+                    <span>🔥 Netherite rang</span>
+                    <span class="price">1250 Ft</span>
+                </div>
+            </div>
+
+
+            <!-- FIZETÉS -->
+            <div class="card payment">
+
+                <h3>💳 Fizetés</h3>
+
+                <p>
+                    A fizetéshez a Discord szerveren kell
+                    írni <strong>Cattusnak!!</strong>
+                </p>
+
+                <br>
+
+                <p>
+                    💬 A pontos fizetési információkat
+                    a Discordon kapjátok meg.
+                </p>
 
             </div>
 
 
             <!-- KÖZÖSSÉGI MÉDIA -->
-            <div class="card">
+            <div class="card social">
 
-                <h2>
-                    🌐 Közösségi média
-                </h2>
+                <h3>💬 Közösségi média</h3>
 
-                <a
-                    href=https://discord.gg/eB6UCxDS
-                    class="social-btn"
-                >
+                <a href="https://discord.gg/Uyej4ftdm" target="_blank">
                     💬 Discord
                 </a>
 
-                <a
-                    href=https://www.youtube.com/@bbcsapat-lk3pm/featured
-                    class="social-btn"
-                >
+                <a href="https://www.youtube.com/@bbcsapat-lk3pm" target="_blank">
                     ▶️ YouTube
                 </a>
 
-                <a
-                    href=https://www.tiktok.com/@cattus_offical0
-                    class="social-btn"
-                >
+                <a href="https://www.tiktok.com/@cattus_offical0" target="_blank">
                     🎵 TikTok
                 </a>
 
             </div>
 
 
-            <!-- SZERVER -->
+            <!-- KÖZÖSSÉG -->
             <div class="card">
 
-                <h2>
-                    🎮 Szerver információ
-                </h2>
+                <h3>👥 Közösség</h3>
 
                 <p>
-                    <strong>Szerver:</strong>
-                    Tejtópia S2
-                </p>
-
-                <br>
-
-                <p>
-                    <strong>Játékmód:</strong>
-                    RolePlay,tulelo
-                </p>
-
-                <br>
-
-                <p>
-                    <strong>Státusz:</strong>
-                    <span class="online">
-                        ● ONLINE
-                    </span>
-                </p>
-
-                <br>
-
-                <p>
-                    <strong>IP cím:</strong>
-                    TejTopia_S2.aternos.me:39013
+                    Lépj be a ForestTopia közösségébe,
+                    játssz a barátaiddal és vegyél részt
+                    a különböző minijátékokban!
                 </p>
 
             </div>
@@ -475,116 +553,63 @@
             <!-- HÍREK -->
             <div class="card">
 
-                <h2>
-                    📰 Legfrissebb hírek
-                </h2>
+                <h3>📰 Hírek & Frissítések</h3>
 
                 <p>
-                    A Tejtópia S2 fejlesztése folyamatban van.
-                </p>
-
-                <br>
-
-                <p>
-                    Új helyszínek, új történetek és új eventek
-                    érkeznek.
-                </p>
-
-                <br>
-
-                <p>
-                    További információk hamarosan!
+                    Itt jelennek majd meg a ForestTopia
+                    legújabb hírei, frissítései és eventjei.
                 </p>
 
             </div>
 
 
-            <!-- S2 ÚJDONSÁGOK -->
+            <!-- SZABÁLYZAT -->
             <div class="card">
 
-                <h2>
-                    ✨ S2 újdonságok
-                </h2>
+                <h3>📜 Szabályzat</h3>
 
                 <p>
-                    🏘️ Új területek
-                </p>
-
-                <p>
-                    📜 Új RP történetek
-                </p>
-
-                <p>
-                    🎉 Több event
-                </p>
-
-                <p>
-                    👥 Fejlesztett közösségi rendszer
-                </p>
-
-            </div>
-
-
-            <!-- STAFF -->
-            <div class="card">
-
-                <h2>
-                    👑 Tejtópia Staff
-                </h2>
-
-                <p>
-                    Tulajdonos:
-                    <strong>Bence</strong>
-                </p>
-
-                <br>
-
-                <p>
-                    Adminok és moderátorok:
-					 <strong>cattus,Denes</strong>
+                    A szerveren minden játékosnak be kell
+                    tartania a ForestTopia szabályzatát.
                 </p>
 
             </div>
 
         </div>
-
-    </section>
+    </div>
 
 
     <footer>
-        © 2026 Tejtópia • Minden jog fenntartva
+        © 2026 Tejtópia & ForestTopia • Minden jog fenntartva
     </footer>
 
-
-    <script>
-
-        function openS2() {
-
-            const panel =
-                document.getElementById("s2Panel");
-
-            panel.classList.add("active");
-
-            setTimeout(function() {
-
-                panel.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start"
-                });
-
-            }, 100);
-        }
+</div>
 
 
-        function openS1() {
+<script>
 
-            alert(
-                "Tejtópia S1 – Az első szezon oldala jelenleg nem elérhető."
-            );
+function openPanel(panelId) {
 
-        }
+    // minden panel bezárása
+    document.querySelectorAll(".panel").forEach(panel => {
+        panel.style.display = "none";
+    });
 
-    </script>
+    // kiválasztott panel megnyitása
+    const panel = document.getElementById(panelId);
+
+    panel.style.display = "block";
+
+    // görgetés a panelhez
+    setTimeout(() => {
+        panel.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    }, 100);
+}
+
+</script>
 
 </body>
 </html>
